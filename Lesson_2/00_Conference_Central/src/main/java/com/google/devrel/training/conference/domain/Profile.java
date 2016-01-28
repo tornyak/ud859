@@ -1,17 +1,24 @@
 package com.google.devrel.training.conference.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.devrel.training.conference.form.ProfileForm.TeeShirtSize;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 
 
-// TODO indicate that this class is an Entity
+@Entity
+@Cache
 public class Profile {
 	String displayName;
 	String mainEmail;
 	TeeShirtSize teeShirtSize;
+	
+	private List <String> conferenceKeysToAttend = new ArrayList<> (0);
 
-	// TODO indicate that the userId is to be used in the Entity's key
+	@Id
 	String userId;
     
     /**
@@ -43,6 +50,36 @@ public class Profile {
 
 	public String getUserId() {
 		return userId;
+	}
+	
+	public List <String> getConferenceKeysToAttend() {
+		return conferenceKeysToAttend;
+	}
+
+	public void addToConferenceKeysToAttend(String conferenceKey) {
+		conferenceKeysToAttend.add(conferenceKey);
+	}
+	
+	public void unregisterFromConference(String conferenceKey) {
+		if(conferenceKeysToAttend.contains(conferenceKey)) {
+			conferenceKeysToAttend.remove(conferenceKey);
+		} else {
+			throw new IllegalArgumentException("Invalid conferenceKey: " + conferenceKey);
+		}
+	}
+
+	public boolean update(String displayName, TeeShirtSize teeShirtSize) {
+		boolean updated = false;
+		if(displayName != null && !this.displayName.equals(displayName)) {
+			this.displayName = displayName;
+			updated = true;
+		}
+		
+		if(teeShirtSize != null && this.teeShirtSize != teeShirtSize) {
+			this.teeShirtSize = teeShirtSize;
+			updated = true;
+		}
+		return updated;
 	}
 
 	/**
